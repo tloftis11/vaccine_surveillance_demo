@@ -20,6 +20,11 @@ for p in (str(PROJECT_ROOT), str(API_DIR)):
     if p not in sys.path:
         sys.path.insert(0, p)
 
+# Skip migration entirely during build phase (DATABASE_URL not yet injected)
+if not os.environ.get("DATABASE_URL"):
+    print("DATABASE_URL not set — skipping migration (will run at startup)")
+    sys.exit(0)
+
 # Import Base (and all models so metadata is complete)
 from api.db import Base  # noqa: E402
 import api.models  # noqa: F401, E402  -- registers all ORM models with Base

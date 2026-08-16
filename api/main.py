@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from config import settings
-from db import Base, engine
+from db import Base
 from routers import coverage, adverse_events, adherence
 
 app = FastAPI(
@@ -29,11 +31,8 @@ app.include_router(adherence.router, prefix="/api")
 
 @app.on_event("startup")
 def on_startup() -> None:
-    """Create tables if they do not exist (fallback to Alembic migrations)."""
-    # Import models so Base metadata is populated before create_all
-    import models  # noqa: F401
-
-    Base.metadata.create_all(bind=engine)
+    import subprocess
+    subprocess.run(["alembic", "upgrade", "head"], check=True, cwd=Path(__file__).parent)
 
 
 @app.get("/health", tags=["meta"])
