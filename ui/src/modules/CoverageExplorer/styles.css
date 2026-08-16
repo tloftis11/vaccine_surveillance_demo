@@ -1,0 +1,246 @@
+.coverage-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-8);
+  flex: 1;
+  min-height: 0;
+}
+
+.coverage-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+}
+
+.coverage-header h1 {
+  font-family: var(--f-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.coverage-header p {
+  font-size: .85rem;
+  color: var(--ink-2);
+  margin-top: var(--sp-1);
+  max-width: 60ch;
+}
+
+/* Filter strip */
+.filter-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-family: var(--f-mono);
+  font-size: .65rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.filter-select {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: .85rem;
+  min-width: 140px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--teal-mid);
+}
+
+/* KPI row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-4);
+}
+
+/* Main grid */
+.coverage-main {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--sp-5);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .coverage-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Map panel */
+.map-panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+
+.panel-title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.panel-sub {
+  font-family: var(--f-mono);
+  font-size: .65rem;
+  color: var(--ink-3);
+}
+
+/* Legend */
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  font-family: var(--f-mono);
+  font-size: .65rem;
+  color: var(--ink-3);
+}
+
+.legend-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, var(--coral-dim), var(--teal));
+}
+
+/* Sidebar */
+.state-sidebar {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+  min-height: 300px;
+}
+
+.state-detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  text-align: center;
+  gap: var(--sp-2);
+  color: var(--ink-3);
+  font-size: .8rem;
+}
+
+.state-name {
+  font-family: var(--f-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--sp-4);
+}
+
+.state-rate-big {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--teal);
+  line-height: 1;
+  margin-bottom: var(--sp-1);
+}
+
+.state-rate-sub {
+  font-size: .75rem;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-4);
+}
+
+.state-target-bar-wrap {
+  margin-bottom: var(--sp-4);
+}
+
+.state-target-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--f-mono);
+  font-size: .65rem;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-1);
+}
+
+.target-track {
+  height: 6px;
+  background: var(--paper-dim);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.target-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--sage);
+  transition: width .4s ease;
+}
+
+.target-fill.below { background: var(--coral); }
+.target-fill.near  { background: var(--amber); }
+
+/* Bottom charts */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-5);
+}
+
+@media (max-width: 800px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--sp-3);
+}
+
+/* HP2030 target reference line label */
+.ref-line-label {
+  font-family: var(--f-mono);
+  font-size: .65rem;
+  fill: var(--amber);
+}

@@ -1,0 +1,75 @@
+databases:
+  - name: vaccine-db
+    databaseName: vaccine_surveillance
+    user: vaccine_user
+    plan: free
+    region: oregon
+
+services:
+  - type: web
+    name: vaccine-api
+    runtime: python
+    region: oregon
+    rootDir: api
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vaccine-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: vaccine-ui
+    runtime: static
+    region: oregon
+    rootDir: ui
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: vaccine-api
+          type: web
+          property: host
+
+  - type: cron
+    name: vaers-pipeline
+    runtime: python
+    region: oregon
+    rootDir: pipelines
+    schedule: "0 2 1 */3 *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python vaers_ingest.py
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vaccine-db
+          property: connectionString
+      - key: VAERS_YEARS
+        value: "2020,2021,2022,2023,2024"
+
+  - type: cron
+    name: nis-pipeline
+    runtime: python
+    region: oregon
+    rootDir: pipelines
+    schedule: "0 3 1 2 *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python nis_ingest.py
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vaccine-db
+          property: connectionString

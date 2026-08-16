@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+*.env
+
+# Node
+node_modules/
+ui/dist/
+ui/.vite/
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Render / secrets
+.env.local
+.env.production
+
+# Data pipeline downloads (large files)
+pipelines/data/raw/
+pipelines/data/downloads/
+*.zip

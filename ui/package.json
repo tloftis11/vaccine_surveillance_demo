@@ -1,0 +1,29 @@
+{
+  "name": "vaccine-surveillance-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .jsx,.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.24.1",
+    "@tanstack/react-query": "^5.51.1",
+    "recharts": "^2.12.7",
+    "react-simple-maps": "^3.0.0",
+    "topojson-client": "^3.1.0",
+    "d3-scale": "^4.0.2",
+    "d3-interpolate": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.3.4"
+  }
+}

@@ -1,0 +1,96 @@
+/* ─── Design Tokens ─── */
+:root {
+  /* Core palette */
+  --teal:         #1D6E7E;
+  --teal-mid:     #2B95AC;
+  --teal-dim:     #D4EBF0;
+  --teal-xdim:    #EAF4F7;
+  --sage:         #3F7A56;
+  --sage-dim:     #DCF0E5;
+  --amber:        #C97D10;
+  --amber-dim:    #FDF3E0;
+  --coral:        #B84535;
+  --coral-dim:    #FAECE9;
+
+  /* Surfaces */
+  --paper:        #F4F6F8;
+  --paper-raised: #FFFFFF;
+  --paper-dim:    #E8EDF2;
+
+  /* Text */
+  --ink:          #1A2B36;
+  --ink-2:        #4A6070;
+  --ink-3:        #8AA0AE;
+
+  /* Borders / shadow */
+  --rule:         #D5DDE3;
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:    0 2px 8px rgba(0,0,0,.08);
+
+  /* Fonts */
+  --f-serif:   ui-serif, Georgia, Cambria, serif;
+  --f-sans:    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --f-mono:    ui-monospace, "Cascadia Code", "Fira Code", "Courier New", monospace;
+
+  /* Radius */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  /* Spacing scale */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --teal:         #3EBBD0;
+    --teal-mid:     #5AD2E8;
+    --teal-dim:     #0C2B35;
+    --teal-xdim:    #081E26;
+    --sage:         #5CB87A;
+    --sage-dim:     #0C2618;
+    --amber:        #E8980A;
+    --amber-dim:    #271800;
+    --coral:        #E06655;
+    --coral-dim:    #2C0D09;
+    --paper:        #0E1B24;
+    --paper-raised: #162330;
+    --paper-dim:    #0A141C;
+    --ink:          #D8E8F0;
+    --ink-2:        #8AAAB8;
+    --ink-3:        #4A6878;
+    --rule:         #1C3040;
+    --shadow-sm:    0 1px 4px rgba(0,0,0,.3);
+    --shadow-md:    0 2px 8px rgba(0,0,0,.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  --teal:         #3EBBD0;
+  --teal-mid:     #5AD2E8;
+  --teal-dim:     #0C2B35;
+  --teal-xdim:    #081E26;
+  --sage:         #5CB87A;
+  --sage-dim:     #0C2618;
+  --amber:        #E8980A;
+  --amber-dim:    #271800;
+  --coral:        #E06655;
+  --coral-dim:    #2C0D09;
+  --paper:        #0E1B24;
+  --paper-raised: #162330;
+  --paper-dim:    #0A141C;
+  --ink:          #D8E8F0;
+  --ink-2:        #8AAAB8;
+  --ink-3:        #4A6878;
+  --rule:         #1C3040;
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.3);
+  --shadow-md:    0 2px 8px rgba(0,0,0,.4);
+}
