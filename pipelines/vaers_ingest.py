@@ -53,6 +53,18 @@ DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 # if it fails, we fall back to looking for the file in DOWNLOAD_DIR.
 
 VAERS_URL_TEMPLATE = "https://vaers.hhs.gov/eSubDownload/data/{year}VAERSData.zip"
+VAERS_URL_TEMPLATE_ALT = "https://vaers.hhs.gov/data/datasets/{year}VAERSData.zip"
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Referer": "https://vaers.hhs.gov/data/datasets.html",
+}
 
 CHUNK_SIZE = 5_000  # rows per DB commit batch
 
@@ -125,29 +137,35 @@ def get_zip_path(year: int) -> Path | None:
         log.info("Using existing file: %s", local_path)
         return local_path
 
-    url = VAERS_URL_TEMPLATE.format(year=year)
-    log.info("Attempting download: %s", url)
+    urls = [
+        VAERS_URL_TEMPLATE.format(year=year),
+        VAERS_URL_TEMPLATE_ALT.format(year=year),
+    ]
+    for url in urls:
+        log.info("Attempting download: %s", url)
+        try:
+            session = requests.Session()
+            session.get("https://vaers.hhs.gov/data/datasets.html", headers=HEADERS, timeout=15)
+            r = session.get(url, headers=HEADERS, timeout=300, stream=True)
+            r.raise_for_status()
+            total = int(r.headers.get("content-length", 0))
+            with open(local_path, "wb") as f:
+                with tqdm(total=total, unit="B", unit_scale=True, desc=f"Downloading {year}") as bar:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                        bar.update(len(chunk))
+            log.info("Downloaded to %s", local_path)
+            return local_path
+        except requests.RequestException as exc:
+            log.warning("Download failed (%s): %s — trying next URL", url, exc)
 
-    try:
-        r = requests.get(url, timeout=120, stream=True)
-        r.raise_for_status()
-        total = int(r.headers.get("content-length", 0))
-        with open(local_path, "wb") as f:
-            with tqdm(total=total, unit="B", unit_scale=True, desc=f"Downloading {year}") as bar:
-                for chunk in r.iter_content(chunk_size=8192):
-                    f.write(chunk)
-                    bar.update(len(chunk))
-        log.info("Downloaded to %s", local_path)
-        return local_path
-
-    except requests.RequestException as exc:
-        log.warning(
-            "Download failed for %d: %s\n"
-            "  → Please download manually from https://vaers.hhs.gov/data/datasets.html\n"
-            "  → Place %s in %s",
-            year, exc, filename, DOWNLOAD_DIR
-        )
-        return None
+    log.warning(
+        "All download attempts failed for %d.\n"
+        "  → Please download manually from https://vaers.hhs.gov/data/datasets.html\n"
+        "  → Place %s in %s",
+        year, filename, DOWNLOAD_DIR
+    )
+    return None
 
 
 def read_csv_from_zip(zip_path: Path, pattern: str) -> pd.DataFrame:
