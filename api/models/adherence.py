@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, Integer, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from api.db import Base
+from db import Base
 
 
 class AdherenceRate(Base):

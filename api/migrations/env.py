@@ -26,8 +26,8 @@ if not os.environ.get("DATABASE_URL"):
     sys.exit(0)
 
 # Import Base (and all models so metadata is complete)
-from api.db import Base  # noqa: E402
-import api.models  # noqa: F401, E402  -- registers all ORM models with Base
+from db import Base  # noqa: E402
+import models  # noqa: F401, E402  -- registers all ORM models with Base
 
 # ---------------------------------------------------------------------------
 # Alembic Config object — gives access to the .ini file values
