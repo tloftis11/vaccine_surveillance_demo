@@ -7,13 +7,11 @@ databases:
 
 services:
   - type: web
-    name: vaccine-api
+    name: vaccine-app
     runtime: python
     region: oregon
-    buildCommand: >
-      pip install -r api/requirements.txt &&
-      cd ui && npm install && npm run build
-    startCommand: cd api && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements.txt && cd ui && npm install && npm run build
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     plan: free
     healthCheckPath: /health
     envVars:
@@ -25,31 +23,3 @@ services:
         value: "3.11.0"
       - key: ANTHROPIC_API_KEY
         sync: false
-
-  - type: cron
-    name: vaers-pipeline
-    runtime: python
-    region: oregon
-    rootDir: pipelines
-    schedule: "0 2 1 */3 *"
-    buildCommand: pip install -r requirements.txt
-    startCommand: python vaers_ingest.py
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaccine-db
-          property: connectionString
-
-  - type: cron
-    name: nis-pipeline
-    runtime: python
-    region: oregon
-    rootDir: pipelines
-    schedule: "0 3 1 2 *"
-    buildCommand: pip install -r requirements.txt
-    startCommand: python nis_ingest.py
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaccine-db
-          property: connectionString

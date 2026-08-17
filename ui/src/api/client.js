@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = ''
 
 async function request(path, params = {}) {
   const url = new URL(`${BASE_URL}/api${path}`, window.location.origin)

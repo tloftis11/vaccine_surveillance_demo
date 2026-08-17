@@ -35,7 +35,5 @@ Thumbs.db
 .env.local
 .env.production
 
-# Data pipeline downloads (large files)
-pipelines/data/raw/
-pipelines/data/downloads/
-*.zip
+# Local SQLite database
+vaccine.db
