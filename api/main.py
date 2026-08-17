@@ -4,7 +4,8 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from config import settings
 from db import Base
@@ -18,7 +19,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,6 +41,16 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/", include_in_schema=False)
-def root() -> RedirectResponse:
-    return RedirectResponse(url="/docs")
+# ── Serve built React app ────────────────────────────────────────────────────
+# In production the UI is built into ui/dist/ by the Render build command.
+# FastAPI serves the static assets and falls back to index.html for all
+# non-API paths so that React Router handles client-side navigation.
+
+UI_DIST = Path(__file__).parent.parent / "ui" / "dist"
+
+if UI_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=str(UI_DIST / "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_spa(full_path: str) -> FileResponse:
+        return FileResponse(str(UI_DIST / "index.html"))

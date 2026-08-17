@@ -1,7 +1,4 @@
-let BASE_URL = import.meta.env.VITE_API_URL || ''
-if (BASE_URL && !BASE_URL.startsWith('http')) {
-  BASE_URL = 'https://' + BASE_URL
-}
+const BASE_URL = import.meta.env.VITE_API_URL || ''
 
 async function request(path, params = {}) {
   const url = new URL(`${BASE_URL}/api${path}`, window.location.origin)
