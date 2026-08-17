@@ -7,8 +7,8 @@ import CoverageTrend from './CoverageTrend'
 import DemographicBreakdown from './DemographicBreakdown'
 import './styles.css'
 
-const VACCINES = ['MMR','DTaP','VAR','HepB','PCV','Hib','Flu','HPV','MenACWY','Tdap']
-const YEARS = [2023,2022,2021,2020,2019,2018,2017,2016,2015]
+const VACCINES = ['DTaP','Flu','HPV','HepA','Hib','MMR','MenACWY','PCV','Polio','RV','Tdap','VAR']
+const YEARS = [2024,2023,2022,2021,2020,2019,2018]
 const DEMO_CATS = [
   { value: 'race_ethnicity', label: 'Race / Ethnicity' },
   { value: 'poverty_level',  label: 'Poverty Level' },
@@ -21,8 +21,8 @@ const HP2030 = {
 }
 
 export default function CoverageExplorer() {
-  const [vaccine, setVaccine] = useState('MMR')
-  const [year, setYear]       = useState(2023)
+  const [vaccine, setVaccine] = useState('DTaP')
+  const [year, setYear]       = useState(2019)
   const [demoCat, setDemoCat] = useState('race_ethnicity')
   const [selectedState, setSelectedState] = useState(null)
 

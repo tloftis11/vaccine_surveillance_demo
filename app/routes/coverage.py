@@ -1,7 +1,8 @@
 from __future__ import annotations
+from statistics import mean
 from typing import Any
 from fastapi import APIRouter, Depends
-from sqlalchemy import distinct, select
+from sqlalchemy import distinct, func, select
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models import CoverageRate
@@ -13,24 +14,50 @@ HP2030 = {"MMR":95.0,"DTaP":90.0,"VAR":90.0,"HepB":90.0,"PCV":90.0,
 
 @router.get("/national")
 def get_national(vaccine: str = "MMR", year: int = 2023, db: Session = Depends(get_db)) -> dict[str, Any]:
-    row = db.execute(select(CoverageRate).where(
+    # Try exact US national row first (may have duplicates from NIS-Child + NIS-Teen)
+    us_rows = db.execute(select(CoverageRate).where(
         CoverageRate.vaccine_code == vaccine, CoverageRate.year == year,
         CoverageRate.state_abbr == "US", CoverageRate.demographic_category == "overall",
-    )).scalar_one_or_none()
+    )).scalars().all()
+
     states = db.execute(select(CoverageRate).where(
         CoverageRate.vaccine_code == vaccine, CoverageRate.year == year,
         CoverageRate.state_abbr != "US", CoverageRate.demographic_category == "overall",
     )).scalars().all()
+
     target = HP2030.get(vaccine)
-    below = sum(1 for s in states if s.coverage_rate is not None and float(s.coverage_rate) < target) if target else 0
+
+    # Compute national rate: prefer US row; fall back to mean of state rows
+    national_rate = ci_lower = ci_upper = None
+    if us_rows:
+        rates = [float(r.coverage_rate) for r in us_rows if r.coverage_rate is not None]
+        lowers = [float(r.ci_lower) for r in us_rows if r.ci_lower is not None]
+        uppers = [float(r.ci_upper) for r in us_rows if r.ci_upper is not None]
+        national_rate = round(mean(rates), 1) if rates else None
+        ci_lower = round(mean(lowers), 1) if lowers else None
+        ci_upper = round(mean(uppers), 1) if uppers else None
+    elif states:
+        rates = [float(s.coverage_rate) for s in states if s.coverage_rate is not None]
+        national_rate = round(mean(rates), 1) if rates else None
+
+    # Deduplicate states by state_abbr (take highest coverage_rate when multiple rows)
+    seen: dict[str, float] = {}
+    for s in states:
+        if s.coverage_rate is not None:
+            v = float(s.coverage_rate)
+            if s.state_abbr not in seen or v > seen[s.state_abbr]:
+                seen[s.state_abbr] = v
+    unique_states = list(seen.values())
+
+    below = sum(1 for v in unique_states if target and v < target)
     return {
         "vaccine": vaccine, "year": year,
-        "national_rate": float(row.coverage_rate) if row and row.coverage_rate is not None else None,
-        "ci_lower": float(row.ci_lower) if row and row.ci_lower is not None else None,
-        "ci_upper": float(row.ci_upper) if row and row.ci_upper is not None else None,
+        "national_rate": national_rate,
+        "ci_lower": ci_lower,
+        "ci_upper": ci_upper,
         "hp2030_target": target,
         "states_below_target": below,
-        "total_states_with_data": len(states),
+        "total_states_with_data": len(unique_states),
     }
 
 @router.get("/states")
@@ -39,10 +66,19 @@ def get_states(vaccine: str = "MMR", year: int = 2023, db: Session = Depends(get
         CoverageRate.vaccine_code == vaccine, CoverageRate.year == year,
         CoverageRate.state_abbr != "US", CoverageRate.demographic_category == "overall",
     ).order_by(CoverageRate.state_abbr)).scalars().all()
-    return [{"state_abbr": r.state_abbr, "state_fips": r.state_fips,
-             "coverage_rate": float(r.coverage_rate) if r.coverage_rate is not None else None,
-             "ci_lower": float(r.ci_lower) if r.ci_lower is not None else None,
-             "ci_upper": float(r.ci_upper) if r.ci_upper is not None else None} for r in rows]
+    # Deduplicate by state_abbr (keep highest coverage when NIS-Child+NIS-Teen both report)
+    seen: dict[str, dict] = {}
+    for r in rows:
+        key = r.state_abbr
+        rate = float(r.coverage_rate) if r.coverage_rate is not None else None
+        if key not in seen or (rate is not None and (seen[key]["coverage_rate"] or 0) < rate):
+            seen[key] = {
+                "state_abbr": r.state_abbr, "state_fips": r.state_fips,
+                "coverage_rate": rate,
+                "ci_lower": float(r.ci_lower) if r.ci_lower is not None else None,
+                "ci_upper": float(r.ci_upper) if r.ci_upper is not None else None,
+            }
+    return sorted(seen.values(), key=lambda x: x["state_abbr"])
 
 @router.get("/trend")
 def get_trend(vaccine: str = "MMR", state: str = "US", db: Session = Depends(get_db)) -> list[dict[str, Any]]:
