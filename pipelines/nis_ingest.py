@@ -229,12 +229,19 @@ def parse_record(row: dict, source: str) -> dict | None:
     demo_cat = str(row.get(dim_type, "overall")).strip()[:50] if dim_type else "overall"
     demo_val = str(row.get(dim_val, "Total")).strip()[:100] if dim_val else "Total"
 
+    # Normalize any "national", "total", "all" variants to "overall" so the
+    # API's demographic_category == "overall" filter matches correctly.
+    OVERALL_SYNONYMS = {"national", "total", "all", "overall", "us_total", "us total"}
+    cat = demo_cat.lower().replace(" ", "_")[:50]
+    if cat in OVERALL_SYNONYMS:
+        cat = "overall"
+
     return {
         "state_abbr": state_abbr,
         "state_fips": STATE_FIPS.get(state_abbr),
         "vaccine_code": vaccine_code,
         "year": year,
-        "demographic_category": demo_cat.lower().replace(" ", "_")[:50],
+        "demographic_category": cat,
         "demographic_value": demo_val,
         "coverage_rate": rate,
         "ci_lower": safe_float(row.get(low_col)) if low_col else None,
